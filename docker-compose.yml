@@ -1,0 +1,66 @@
+services:
+  # PHP-FPM 核心服务
+  php:
+    build:
+      context: ./php
+    container_name: lemp-php
+    restart: always
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - lemp-network
+
+  # Nginx Web服务器
+  nginx:
+    image: nginx:latest
+    container_name: lemp-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./www:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - lemp-network
+    depends_on:
+      - php
+
+  # MySQL 数据库 (8.0 版本，学校常用)
+  mysql:
+    image: mysql:8.0
+    container_name: lemp-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${rootPassword}
+      MYSQL_DATABASE: ${database}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - lemp-network
+
+  # phpMyAdmin 图形化管理界面
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: lemp-phpmyadmin
+    restart: always
+    ports:
+      - "8080:80" # 访问地址为 http://LXC_IP:8080
+    environment:
+      - PMA_HOST=mysql # 指向上面 mysql 服务的名称
+      - PMA_PORT=3306
+      - UPLOAD_LIMIT=64M # 调大上传限制，方便导入大型 SQL 文件
+    networks:
+      - lemp-network
+    depends_on:
+      - mysql
+
+networks:
+  lemp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

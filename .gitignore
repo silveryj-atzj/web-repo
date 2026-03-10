@@ -1,0 +1,29 @@
+# === Docker 运行时数据 (绝对不能上传) ===
+mysql_data/
+*.log
+.docker-temp/
+
+# === 敏感信息与环境变量 ===
+# 如果你以后用 .env 文件存储数据库密码，记得取消下面的注释
+.env
+
+# === PHP 相关 (Composer/Vendors) ===
+/www/vendor/
+/www/.phpunit.result.cache
+/www/.php-cs-fixer.cache
+
+# === 数据库相关 (备份或导出文件) ===
+*.sql
+*.sql.gz
+/mysql/init/*.sql
+!/mysql/init/.gitkeep
+
+# === 操作系统/IDE 杂项 ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# === Portainer/CI 相关缓存 ===
+.portainer_stack_data/
