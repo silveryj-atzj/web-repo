@@ -13,7 +13,7 @@ services:
       LABELS: "self-hosted,lemp-deploy"
     volumes:
       # 关键：让 Runner 容器能直接修改 nginx 容器挂载的代码目录
-      - ./www:/var/www/html
+      - ./:/opt/stack-root
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - lemp-network
