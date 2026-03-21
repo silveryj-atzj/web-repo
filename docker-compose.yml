@@ -6,9 +6,9 @@ services:
     restart: always
     environment:
       # 1. 替换为你的 GitHub 仓库地址
-      REPO_URL: "https://github.com/silveryj-atzj/web-repo.git"
+      REPO_URL: ${repo-url}
       # 2. 替换为你在 GitHub Actions 页面获取的 Token
-      RUNNER_TOKEN: "ASHYNXHKHVOW5SVAOIXGRZTJXZW6U"
+      RUNNER_TOKEN: ${runner-token}
       RUNNER_NAME: "pve-lemp-runner"
       LABELS: "self-hosted,lemp-deploy"
     volumes:
