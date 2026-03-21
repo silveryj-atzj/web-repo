@@ -1,40 +1,45 @@
 name: Deploy LEMP Stack
 
-# 触发条件：当代码推送到 main 分支时触发
 on:
   push:
     branches:
       - main
-  # 允许手动触发调试
   workflow_dispatch:
 
 jobs:
   deploy:
-    # 关键：对应你在 docker-compose 里设置的 LABELS
     runs-on: self-hosted
 
     steps:
-      # 1. 拉取 GitHub 仓库的代码到 Runner 容器的工作目录
+      # 1. 拉取代码
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # 取消默认的持久化凭证，确保清理干净
+          persist-credentials: false
 
-      # 2. 同步代码到 Nginx/PHP 挂载的目录
-      - name: Sync Files to LEMP Environment
+      # 2. 同步全量文件（包含配置和 Compose 文件）
+      - name: Sync Full Repo to Stack Root
         run: |
-          echo "Starting deployment..."
+          echo "Starting full repository sync..."
           
-          # 使用 rsync 同步文件，--exclude 可以排除掉不需要上线的文件（如 .git）
-          # 注意：这里的 /var/www/html 是我们在 docker-compose 里挂载给 runner 的路径
+          # 核心指令：
+          # -a: 归档模式
+          # -v: 显示详情
+          # --delete: 确保删除仓库里已经删掉的文件
+          # --exclude '.git/': 必须排除这个，否则会弄乱权限
+          # ./: 代表当前仓库根目录
+          # /opt/stack-root/: 指向 Runner 容器中挂载的宿主机 Stack 根目录
+          
           sudo rsync -av --delete \
             --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude 'docker-compose.yml' \
             ./ /opt/stack-root/
           
-          echo "Sync completed."
+          echo "Sync completed. All files including configs and docker-compose are updated."
 
-      # 4. 如果修改了数据库初始化文件或配置，可以执行重启（可选）
-      # - name: Restart Services
-      #   run: |
-      #     # 只有当你需要刷新容器配置时才使用，普通代码更新不需要重启
-      #     # docker restart lemp-nginx lemp-php
+      # 3. 自动应用配置更改（可选）
+      # 如果你修改了 nginx 配置或 docker-compose.yml，通常需要 reload 或 restart 才会生效
+      - name: Reload Nginx Configuration
+        run: |
+          # 只有当 lemp-nginx 容器正在运行时，此命令才会生效
+          docker exec lemp-nginx nginx -s reload || echo "Nginx not running, skipping reload."
