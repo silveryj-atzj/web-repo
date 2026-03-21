@@ -1,5 +1,24 @@
 services:
-  # PHP-FPM 核心服务
+  # --- GitHub Self-hosted Runner ---
+  runner:
+    image: myoung34/github-runner:latest
+    container_name: lemp-github-runner
+    restart: always
+    environment:
+      # 1. 替换为你的 GitHub 仓库地址
+      REPO_URL: "https://github.com/silveryj-atzj/web-repo.git"
+      # 2. 替换为你在 GitHub Actions 页面获取的 Token
+      RUNNER_TOKEN: "ASHYNXHKHVOW5SVAOIXGRZTJXZW6U"
+      RUNNER_NAME: "pve-lemp-runner"
+      LABELS: "self-hosted,lemp-deploy"
+    volumes:
+      # 关键：让 Runner 容器能直接修改 nginx 容器挂载的代码目录
+      - ./www:/var/www/html
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - lemp-network
+
+  # --- PHP-FPM 核心服务 ---
   php:
     build:
       context: ./php
@@ -10,13 +29,13 @@ services:
     networks:
       - lemp-network
 
-  # Nginx Web服务器
+  # --- Nginx Web服务器 ---
   nginx:
     image: nginx:latest
     container_name: lemp-nginx
     restart: always
     ports:
-      - "80:80"
+      - "8081:80"
       - "443:443"
     volumes:
       - ./www:/var/www/html
@@ -26,7 +45,7 @@ services:
     depends_on:
       - php
 
-  # MySQL 数据库 (8.0 版本，学校常用)
+  # --- MySQL 数据库 ---
   mysql:
     image: mysql:8.0
     container_name: lemp-mysql
@@ -42,17 +61,17 @@ services:
     networks:
       - lemp-network
 
-  # phpMyAdmin 图形化管理界面
+  # --- phpMyAdmin 图形化管理界面 ---
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: lemp-phpmyadmin
     restart: always
     ports:
-      - "8080:80" # 访问地址为 http://LXC_IP:8080
+      - "8080:80"
     environment:
-      - PMA_HOST=mysql # 指向上面 mysql 服务的名称
+      - PMA_HOST=mysql
       - PMA_PORT=3306
-      - UPLOAD_LIMIT=64M # 调大上传限制，方便导入大型 SQL 文件
+      - UPLOAD_LIMIT=64M
     networks:
       - lemp-network
     depends_on:

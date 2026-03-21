@@ -1,0 +1,49 @@
+name: Deploy LEMP Stack
+
+# 触发条件：当代码推送到 main 分支时触发
+on:
+  push:
+    branches:
+      - main
+  # 允许手动触发调试
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # 关键：对应你在 docker-compose 里设置的 LABELS
+    runs-on: self-hosted
+
+    steps:
+      # 1. 拉取 GitHub 仓库的代码到 Runner 容器的工作目录
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 同步代码到 Nginx/PHP 挂载的目录
+      - name: Sync Files to LEMP Environment
+        run: |
+          echo "Starting deployment..."
+          
+          # 使用 rsync 同步文件，--exclude 可以排除掉不需要上线的文件（如 .git）
+          # 注意：这里的 /var/www/html 是我们在 docker-compose 里挂载给 runner 的路径
+          sudo rsync -av --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'docker-compose.yml' \
+            ./ /var/www/html/
+          
+          echo "Sync completed."
+
+      # 3. 修正权限（可选，针对 PHP 写入权限）
+      - name: Fix Permissions
+        run: |
+          # 假设容器内 php-fpm 的用户 UID 是 33 (www-data)
+          # 在内网测试环境可以直接 chmod 755，如果遇到写入报错再调优
+          sudo chmod -R 755 /var/www/html
+          # 如果你的程序（如 Laravel）需要写入权限，解除下面注释：
+          # sudo chown -R 33:33 /var/www/html
+
+      # 4. 如果修改了数据库初始化文件或配置，可以执行重启（可选）
+      # - name: Restart Services
+      #   run: |
+      #     # 只有当你需要刷新容器配置时才使用，普通代码更新不需要重启
+      #     # docker restart lemp-nginx lemp-php
