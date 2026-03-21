@@ -33,15 +33,6 @@ jobs:
           
           echo "Sync completed."
 
-      # 3. 修正权限（可选，针对 PHP 写入权限）
-      - name: Fix Permissions
-        run: |
-          # 假设容器内 php-fpm 的用户 UID 是 33 (www-data)
-          # 在内网测试环境可以直接 chmod 755，如果遇到写入报错再调优
-          sudo chmod -R 755 /var/www/html
-          # 如果你的程序（如 Laravel）需要写入权限，解除下面注释：
-          # sudo chown -R 33:33 /var/www/html
-
       # 4. 如果修改了数据库初始化文件或配置，可以执行重启（可选）
       # - name: Restart Services
       #   run: |
