@@ -29,7 +29,7 @@ jobs:
           # --delete: 确保删除仓库里已经删掉的文件
           # --exclude '.git/': 必须排除这个，否则会弄乱权限
           # ./: 代表当前仓库根目录
-          # /opt/stack-root/: 指向 Runner 容器中挂载的宿主机 Stack 根目录
+          # /opt/Webdev/: 指向 Runner 容器中挂载的宿主机 Stack 根目录
           
           sudo rsync -av --delete \
             --exclude '.git/' \
