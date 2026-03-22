@@ -33,7 +33,8 @@ jobs:
           
           sudo rsync -av --delete \
             --exclude '.git/' \
-            ./ /opt/stack-root/
+            --exclude 'runner/' \
+            ./ /opt/Webdev/
           
           echo "Sync completed. All files including configs and docker-compose are updated."
 
