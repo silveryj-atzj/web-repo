@@ -9,13 +9,13 @@
     <meta name="description" content="<?php echo $_description ?? '银橘の站'; ?>">
     <meta name="银橘" content="银橘の站">
 
-    <link rel="icon" href="/www/resources/logo-favicon.png" type="image/png" alt="MySite Logo">
+    <link rel="icon" href="/resources/logo-favicon.png" type="image/png" alt="MySite Logo">
 
-    <link rel="stylesheet" href="/www/css/main.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/css/main.css?v=<?php echo time(); ?>">
 
     <?php if (isset($_styles)): ?>
         <?php foreach ($_styles as $style): ?>
-            <link rel="stylesheet" href="/www/css/<?php echo $style; ?>.css">
+            <link rel="stylesheet" href="/css/<?php echo $style; ?>.css">
         <?php endforeach; ?>
     <?php endif; ?>
 
