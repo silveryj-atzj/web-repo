@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title><?php echo isset($_title) ? "$_title - MySite" : "My Personal Site"; ?></title>
+    <title><?php echo isset($_title) ? "$_title - 银橘の站" : "银橘"; ?></title>
 
     <meta name="description" content="<?php echo $_description ?? '银橘の站'; ?>">
     <meta name="银橘" content="银橘の站">
